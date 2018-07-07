@@ -33,7 +33,7 @@ public class BatchInsert {
             }
             Table table = CoreConfig.conn.getTable(TableName.valueOf("ns1:company_change_info"));
             Table insertTable = CoreConfig.conn.getTable(TableName.valueOf("company_change_info_delete"));
-            pageScan(table,insertTable,"update",getColByTableName("company_change_info"));
+            pageScan(table,insertTable,"update",getColByTableName("company_change_info"),Integer.parseInt(args[0]));
             table.close();
             insertTable.close();
         } catch (IOException e) {
@@ -86,14 +86,15 @@ public class BatchInsert {
         return allIds;
     }
 
-    public static void pageScan(Table table,Table insertTable,String cf,String col) throws IOException {
+    public static void pageScan(Table table,Table insertTable,String cf,String col,int pagenum) throws IOException {
         List allIds = new ArrayList<>();
         byte[] POSTFIX = new byte[] { 0x00 };//长度为零的字节数组
-        Filter filter = new PageFilter(500);//设置一页所含的行数
+        Filter filter = new PageFilter(pagenum);//设置一页所含的行数
         int totalRows = 0;//总行数
         byte[] lastRow = null;//该页的最后一行
         while (true) {
             Scan scan = new Scan();
+            scan.setCaching(pagenum);//取1000条记录
             scan.setFilter(filter);
             //如果不是第一页
             if (lastRow != null) {
