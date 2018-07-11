@@ -31,9 +31,9 @@ public class BatchInsert {
 //                table.close();
 //                insertTable.close();
             }
-            Table table = CoreConfig.conn.getTable(TableName.valueOf("ns1:company_change_info"));
-            Table insertTable = CoreConfig.conn.getTable(TableName.valueOf("company_change_info_delete"));
-            pageScan(table,insertTable,"update",getColByTableName("company_change_info"),Integer.parseInt(args[0]));
+            Table table = CoreConfig.conn.getTable(TableName.valueOf("gs:company_check_info"));
+            Table insertTable = CoreConfig.conn.getTable(TableName.valueOf("gd:company_check_info_delete"));
+            pageScan(table,insertTable,"update",getColByTableName("company_check_info"),Integer.parseInt(args[0]));
             table.close();
             insertTable.close();
         } catch (IOException e) {
@@ -54,10 +54,8 @@ public class BatchInsert {
     public static List batchScan(Table table,Table insertTable,String cf,String col) throws IOException {
 
         Scan scan = new Scan();
-//        String cf = "update";
-//        String col ="annualreport_id";
+
         List allIds = new ArrayList<>();
-//        scan.addColumn(Bytes.toBytes(cf), Bytes.toBytes(col));
 
         scan.addColumn(Bytes.toBytes(cf), Bytes.toBytes(col))
                 .setStartRow(Bytes.toBytes("000000000")).setStopRow(Bytes.toBytes("000010000"));
@@ -79,7 +77,7 @@ public class BatchInsert {
             }
         }
         if(allIds.size()>0){
-            batchSave(insertTable, "info", "id", allIds);
+            batchSave(insertTable,  cf, "id", allIds);
         }
         System.out.println("数目："+allIds.size());
         scanner.close();
@@ -88,19 +86,21 @@ public class BatchInsert {
 
     public static void pageScan(Table table,Table insertTable,String cf,String col,int pagenum) throws IOException {
         List allIds = new ArrayList<>();
-        byte[] POSTFIX = new byte[] { 0x00 };//长度为零的字节数组
         Filter filter = new PageFilter(pagenum);//设置一页所含的行数
         int totalRows = 0;//总行数
         byte[] lastRow = null;//该页的最后一行
+        byte[] startRow = new byte[] { 0 };
+
         while (true) {
             Scan scan = new Scan();
             scan.setCaching(pagenum);//取1000条记录
+            scan.setStartRow(startRow);
             scan.setFilter(filter);
             //如果不是第一页
             if (lastRow != null) {
                 // 因为不是第一页，所以我们需要设置其实位置，我们在上一页最后一个行键后面加了一个零，来充当上一页最后一个行键的下一个
 //                byte[] startRow = Bytes.add(lastRow, POSTFIX);
-                byte[] startRow = lastRow;
+                startRow = lastRow;
                 System.out.println("start row: "
                         + Bytes.toStringBinary(startRow));
                 scan.setStartRow(startRow);
@@ -123,7 +123,7 @@ public class BatchInsert {
                 totalRows++;
                 lastRow = result.getRow();//获取最后一行的行键
             }
-            batchSave(insertTable, "info", "id", allIds);
+            batchSave(insertTable,cf, "id", allIds);
             scanner.close();
             //最后一页，查询结束
             if (localRows == 0)

@@ -17,8 +17,8 @@ public class BatchDelete {
         BatchDelete bd = new BatchDelete();
         try {
             List<String> ids = bd.getIds(args[0]);
-            Table indexTable = CoreConfig.conn.getTable(TableName.valueOf("report_webinfo_delete"));
-            Table deleteTable = CoreConfig.conn.getTable(TableName.valueOf("ns1:report_webinfo"));
+            Table indexTable = CoreConfig.conn.getTable(TableName.valueOf("gd:company_change_info_delete"));
+            Table deleteTable = CoreConfig.conn.getTable(TableName.valueOf("gs:company_change_info"));
             bd.deleteById(indexTable,deleteTable,ids);
         } catch (Exception e) {
             e.printStackTrace();
@@ -65,7 +65,7 @@ public class BatchDelete {
             ResultScanner scanner = indexTable.getScanner(scan);
             Result next = scanner.next();
             while(next !=null){
-                byte[] value = next.getValue(Bytes.toBytes("info"), Bytes.toBytes("id"));
+                byte[] value = next.getValue(Bytes.toBytes("update"), Bytes.toBytes("id"));
                 deletes.add(new Delete(value));
                 next = scanner.next();
             }
