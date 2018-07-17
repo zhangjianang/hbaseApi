@@ -8,6 +8,9 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.ang.hbase.Constants.REPORT_CONN;
+import static com.ang.hbase.Constants.REPORT_S_CONN;
+
 /**
  * Created by adimn on 2018/6/25.
  */
@@ -16,10 +19,17 @@ public class BatchDelete {
     public static void main(String[] args) {
         BatchDelete bd = new BatchDelete();
         try {
-            List<String> ids = bd.getIds(args[0]);
-            Table indexTable = CoreConfig.conn.getTable(TableName.valueOf("gd:company_change_info_delete"));
-            Table deleteTable = CoreConfig.conn.getTable(TableName.valueOf("gs:company_change_info"));
-            bd.deleteById(indexTable,deleteTable,ids);
+            List<String> tables = new ArrayList<String>();
+//            tables.addAll(COMPANY_CONN);
+            tables.addAll(REPORT_CONN);
+            tables.addAll(REPORT_S_CONN);
+            for(String tablename:tables) {
+                System.out.println(tablename + "_delete 增加数据");
+                List<String> ids = bd.getIds(args[0]);
+                Table indexTable = CoreConfig.conn.getTable(TableName.valueOf("gd:company_change_info_delete"));
+                Table deleteTable = CoreConfig.conn.getTable(TableName.valueOf("gs:company_change_info"));
+                bd.deleteById(indexTable, deleteTable, ids);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

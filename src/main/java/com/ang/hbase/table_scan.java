@@ -23,10 +23,10 @@ public class table_scan {
         Configuration conf = HBaseConfiguration.create();
         conf.set("hbase.zookeeper.quorum", CoreConfig.HBASE_QUROM);
         Connection connection = ConnectionFactory.createConnection(conf);
-        Table table = connection.getTable(TableName.valueOf(Constants.TABLE_NAME));
+        Table table = connection.getTable(TableName.valueOf("gs:company_change_info"));
 
         List<String> arr=new ArrayList<String>();
-        arr.add("cf1,name,20");
+        arr.add("update,name,20");
 //        arr.add("course,math,100");
         selectByFilter(table,arr);
         connection.close();

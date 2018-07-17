@@ -19,23 +19,23 @@ public class BatchInsert {
     public static void main(String[] args) {
         try {
             List<String> tables = new ArrayList<String>();
-            tables.addAll(COMPANY_CONN);
+//            tables.addAll(COMPANY_CONN);
             tables.addAll(REPORT_CONN);
             tables.addAll(REPORT_S_CONN);
             for(String tablename:tables){
-//                System.out.println(tablename+"_delete 增加数据");
+                System.out.println(tablename+"_delete 增加数据");
 
-//                Table table = CoreConfig.conn.getTable(TableName.valueOf("ns1:"+tablename));
-//                Table insertTable = CoreConfig.conn.getTable(TableName.valueOf(tablename+"_delete"));
-//                batchScan(table,insertTable,"update",getColByTableName(tablename));
-//                table.close();
-//                insertTable.close();
+                Table table = CoreConfig.conn.getTable(TableName.valueOf("gs:"+tablename));
+                Table insertTable = CoreConfig.conn.getTable(TableName.valueOf("gd:"+tablename+"_delete"));
+                pageScan(table,insertTable,"update",getColByTableName(tablename),Integer.parseInt(args[0]));
+                table.close();
+                insertTable.close();
             }
-            Table table = CoreConfig.conn.getTable(TableName.valueOf("gs:company_check_info"));
-            Table insertTable = CoreConfig.conn.getTable(TableName.valueOf("gd:company_check_info_delete"));
-            pageScan(table,insertTable,"update",getColByTableName("company_check_info"),Integer.parseInt(args[0]));
-            table.close();
-            insertTable.close();
+//            Table table = CoreConfig.conn.getTable(TableName.valueOf("gs:company_check_info"));
+//            Table insertTable = CoreConfig.conn.getTable(TableName.valueOf("gd:company_check_info_delete"));
+//            pageScan(table,insertTable,"update",getColByTableName("company_check_info"),Integer.parseInt(args[0]));
+//            table.close();
+//            insertTable.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
